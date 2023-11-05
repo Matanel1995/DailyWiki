@@ -48,6 +48,17 @@ export default function Home(){
         }
     }
 
+    function navigate(url){
+        window.location.href = url
+    }
+
+    const googleAuth = async () => {
+        const response = await fetch('http://localhost:4000/oauth',{method:'POST'});
+        const data =await response.json();
+        navigate(data.url);
+    }
+
+
     return(
         <section className="bg-gray-50 min-h-screen flex items-center justify-center">
             <div className="bg-gray-100 flex rounded-2xl shadow-lg max-w-3xl p-5 items-center">
@@ -100,14 +111,14 @@ export default function Home(){
                     {/* devidor */}
                     <div className='mt-10 grid grid-cols-3 items-center text-gray-500'>
                         <hr className='border-gray-500'></hr>
-                        <p className='text-center text-sm'>Or</p>
+                        <p className='text-center text-sm'>Or Sign in with</p>
                         <hr className='border-gray-500'></hr>
                     </div>
 
 
                     {/* google and linkedin */}
                     <div className='flex items-center justify-around pt-4'>
-                        <Image className='bg-white border p-2 aspect-square w-12 hover:scale-105' onClick='' src={google} alt=''></Image>
+                        <Image className='bg-white border p-2 aspect-square w-12 hover:scale-105' onClick={googleAuth} src={google} alt=''></Image>
                         <Image className='bg-white border p-2 aspect-square w-12 hover:scale-105' onClick='' src={apple} alt=''></Image>
                         <Image className='bg-white border p-2 aspect-square w-12 hover:scale-105' onClick='' src={linkedIn} alt=''></Image>
                     </div>

@@ -10,6 +10,7 @@ export default function Navbar(){
                 <div className="p-4 flex justify-end items-center gap-4">
                     <Link className="rounded-full py-2 px-4 bg-gray-100 hover:bg-green-500" href= '/signin'>Login</Link>
                     <Link className="rounded-full py-2 px-4 bg-gray-200 hover:bg-green-500" href= '/signup'>Sign up</Link>
+                    <Link className="rounded-full py-2 px-4 bg-gray-200 hover:bg-green-500" href= 'http://localhost:4000/logout'>Log out</Link>
                 </div>
             </nav>
         </header>

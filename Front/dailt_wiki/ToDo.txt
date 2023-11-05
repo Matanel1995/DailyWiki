@@ -1,0 +1,11 @@
+sudo service mongod start
+
+
+
+1. After user sign in with google add his information to users db - V
+2. create him a JWB like normal user
+3. in google Sign in return user info from DB 
+
+
+
+4. display User info in client side

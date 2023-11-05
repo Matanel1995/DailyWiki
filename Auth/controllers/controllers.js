@@ -2,6 +2,8 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const { OAuth2Client } = require('google-auth-library'); 
+
+
 dotenv.config();
 
 //Handle errors
@@ -31,8 +33,8 @@ const handleErrors = (err)=>{
     return error;
 }
 
-const createToken = (id) => {
-    return jwt.sign({ id }, 'secret_key',{
+module.exports.createToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET,{
         expiresIn: 24 * 60 * 60 // 1 day
     });
 }
@@ -67,8 +69,9 @@ module.exports.signin_post = async (req, res) =>{
     try{
         const user = await User.login(email, password);
         const token = createToken(user._id);
-        res.cookie('jwt',token, { httpOnly: true, maxAge: 1000 * 24 * 60 * 60});
-        res.status(200).json({user: user._id});
+        res.cookie('jwt',token, { httpOnly: true , maxAge: 1000 * 24 * 60 * 60, origin: 'localhost', SameSite: 'none'});
+        const {password: password1 , ...rest} = user;
+        res.status(200).json({user: rest._doc});
     }
     catch(err){
         const errors = handleErrors(err);
@@ -87,11 +90,40 @@ module.exports.googleSign_post = (req, res) =>{
 
     const authorizeUrl = oAuth2Client.generateAuthUrl({
         access_type: 'offline',
-        scope: 'https://www.googleapis.com/auth/userinfo.profile  openid ',
+        scope: 'https://www.googleapis.com/auth/userinfo.profile  openid  https://www.googleapis.com/auth/userinfo.email', 
         prompt: 'consent'
         });
-    console.log(authorizeUrl);
+    // console.log(authorizeUrl);
     res.json({url:authorizeUrl});
 }
 
 
+
+module.exports.validateJWT_get = (req, res) =>{
+    //get cookie from browser
+    const token = req.body.token || req.query.token || req.headers["x-access-token"];
+    // const token = req.cookies.jwt;
+    console.log(token);
+    if(token){
+        //if token exist need to check its not compermized
+        const valid = jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) =>{
+            if(err){
+                console.log(err.message);
+                res.status(403).send('Error validating JWT token');        
+            }
+            else{
+                // token exist and verified, so can continue
+                res.status(200).send('Ok');
+            }
+        });
+    }
+    else{
+        res.status(403).send('Error validating JWT token');
+    }
+}
+
+module.exports.logout_get = (req, res) =>{
+   // give black value and expired after 1 ms
+    res.cookie('jwt','',{maxAge: 1});
+    res.redirect('http://localhost:3000/');
+}
